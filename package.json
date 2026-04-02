@@ -1,0 +1,12 @@
+{
+  "name": "the-mdl-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The MDL web portals monorepo — public site and admin portal",
+  "scripts": {
+    "build:public": "cd packages/public && npm run build",
+    "build:admin": "cd packages/admin && npm run build",
+    "dev:public": "cd packages/public && npm run dev",
+    "dev:admin": "cd packages/admin && npm run dev"
+  }
+}
