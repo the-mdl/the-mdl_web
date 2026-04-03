@@ -1,0 +1,12 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-drift-primary: #6AAAC8;
+  --color-drift-bg: #080C10;
+  --color-drift-surface: #0C1418;
+  --color-drift-text: #8ABAC8;
+  --color-drift-muted: #3A6A7A;
+  --color-drift-accent: #8AC4D8;
+  --font-heading: 'DM Sans', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
