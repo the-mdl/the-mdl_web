@@ -9,6 +9,7 @@ import {
   AlertOutlined,
   DollarOutlined,
   MailOutlined,
+  NotificationOutlined,
 } from '@ant-design/icons';
 
 import { authProvider } from './providers/auth-provider';
@@ -23,6 +24,7 @@ import { CircleShowPage } from './pages/circles/show';
 import { AlertListPage } from './pages/alerts/list';
 import { CostPage } from './pages/cost/index';
 import { InviteListPage } from './pages/invites/list';
+import { PushPage } from './pages/push/index';
 
 import 'antd/dist/reset.css';
 
@@ -74,6 +76,11 @@ export default function App() {
                 list: '/invites',
                 meta: { label: 'Invites', icon: <MailOutlined /> },
               },
+              {
+                name: 'push',
+                list: '/push',
+                meta: { label: 'Push', icon: <NotificationOutlined /> },
+              },
             ]}
             options={{ syncWithLocation: true, disableTelemetry: true }}
           >
@@ -105,6 +112,7 @@ export default function App() {
                 <Route path="/alerts" element={<AlertListPage />} />
                 <Route path="/cost" element={<CostPage />} />
                 <Route path="/invites" element={<InviteListPage />} />
+                <Route path="/push" element={<PushPage />} />
               </Route>
             </Routes>
           </Refine>
