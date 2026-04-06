@@ -1,5 +1,5 @@
 import { useList } from '@refinedev/core';
-import { Table, Typography, Space, Card, Input, Button, Form, Tag, App } from 'antd';
+import { Table, Typography, Space, Card, Input, Button, Form, App } from 'antd';
 import { useState } from 'react';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
@@ -7,12 +7,6 @@ import { apiClient } from '../../providers/api-client';
 
 const { Title } = Typography;
 const { TextArea } = Input;
-
-const statusColors: Record<string, string> = {
-  pending: 'blue',
-  accepted: 'green',
-  expired: 'red',
-};
 
 interface WhitelistEntry {
   email: string;
@@ -24,9 +18,8 @@ interface InviteRow {
   id: string;
   email: string;
   code: string;
-  status: string;
   created_at: string;
-  expires_at: string | null;
+  created_by: string | null;
 }
 
 export const InviteListPage = () => {
@@ -131,9 +124,6 @@ export const InviteListPage = () => {
   const inviteColumns: ColumnsType<InviteRow> = [
     { title: 'Email', dataIndex: 'email', key: 'email' },
     { title: 'Code', dataIndex: 'code', key: 'code' },
-    { title: 'Status', dataIndex: 'status', key: 'status', render: (val: string) => (
-      <Tag color={statusColors[val] ?? 'default'}>{val}</Tag>
-    ) },
     {
       title: 'Created',
       dataIndex: 'created_at',
@@ -143,16 +133,15 @@ export const InviteListPage = () => {
     {
       title: 'Actions',
       key: 'actions',
-      render: (_: unknown, record: InviteRow) =>
-        record.status !== 'accepted' ? (
-          <Button
-            size="small"
-            loading={resendingCode === record.code}
-            onClick={() => handleResend(record.code)}
-          >
-            Resend
-          </Button>
-        ) : null,
+      render: (_: unknown, record: InviteRow) => (
+        <Button
+          size="small"
+          loading={resendingCode === record.code}
+          onClick={() => handleResend(record.code)}
+        >
+          Resend
+        </Button>
+      ),
     },
   ];
 
