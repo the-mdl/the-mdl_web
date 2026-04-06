@@ -35,6 +35,7 @@ export const InviteListPage = () => {
   const [adding, setAdding] = useState(false);
   const [sendingInvite, setSendingInvite] = useState(false);
   const [sendingBulk, setSendingBulk] = useState(false);
+  const [resendingCode, setResendingCode] = useState<string | null>(null);
   const [inviteForm] = Form.useForm();
   const [bulkForm] = Form.useForm();
 
@@ -78,6 +79,18 @@ export const InviteListPage = () => {
       messageApi.error(err.response?.data?.message ?? 'Failed to send invite');
     } finally {
       setSendingInvite(false);
+    }
+  };
+
+  const handleResend = async (code: string) => {
+    setResendingCode(code);
+    try {
+      const res = await apiClient.post(`/admin/invites/${code}/resend`);
+      messageApi.success(`Invite re-sent to ${res.data?.email ?? 'recipient'}`);
+    } catch (err: any) {
+      messageApi.error(err.response?.data?.message ?? 'Failed to resend invite');
+    } finally {
+      setResendingCode(null);
     }
   };
 
@@ -126,6 +139,20 @@ export const InviteListPage = () => {
       dataIndex: 'created_at',
       key: 'created_at',
       render: (val: string) => dayjs(val).format('YYYY-MM-DD'),
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_: unknown, record: InviteRow) =>
+        record.status !== 'accepted' ? (
+          <Button
+            size="small"
+            loading={resendingCode === record.code}
+            onClick={() => handleResend(record.code)}
+          >
+            Resend
+          </Button>
+        ) : null,
     },
   ];
 
