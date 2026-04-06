@@ -1,7 +1,7 @@
 import { useList } from '@refinedev/core';
 import {
   Table, Tag, Typography, Space, Select, Radio, Button, Modal, Input, App,
-  Tabs, Form, DatePicker, Card, Popconfirm,
+  Tabs, Form, DatePicker, Card, Popconfirm, Checkbox,
 } from 'antd';
 import { useState } from 'react';
 import type { ColumnsType } from 'antd/es/table';
@@ -213,12 +213,29 @@ const TesterAlertsTab = () => {
     try {
       const values = await form.validateFields();
       setCreating(true);
+
+      // Create the tester alert (in-app banner)
       await apiClient.post('/admin/tester-alerts', {
         title: values.title,
         message: values.message,
         ...(values.expiresAt ? { expiresAt: values.expiresAt.toISOString() } : {}),
       });
-      messageApi.success('Tester alert created');
+
+      // Also send push notification if opted in
+      if (values.sendPush) {
+        try {
+          const { data: pushResult } = await apiClient.post('/admin/push/broadcast', {
+            title: values.title,
+            body: values.message,
+          });
+          messageApi.success(`Alert created + push sent to ${pushResult.sent} device(s)`);
+        } catch {
+          messageApi.warning('Alert created but push notification failed');
+        }
+      } else {
+        messageApi.success('Tester alert created');
+      }
+
       form.resetFields();
       setCreateOpen(false);
       refetch();
@@ -357,6 +374,13 @@ const TesterAlertsTab = () => {
             extra="Alert automatically expires at this time. Leave blank for manual expiration."
           >
             <DatePicker showTime format="YYYY-MM-DD HH:mm" style={{ width: '100%' }} />
+          </Form.Item>
+          <Form.Item
+            name="sendPush"
+            valuePropName="checked"
+            initialValue={false}
+          >
+            <Checkbox>Also send push notification to all devices</Checkbox>
           </Form.Item>
         </Form>
       </Modal>
