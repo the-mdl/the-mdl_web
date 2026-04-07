@@ -20,12 +20,8 @@ export function DownloadPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const manifestUrl = import.meta.env.VITE_MANIFEST_URL;
-    if (!manifestUrl) {
-      setLoading(false);
-      setManifestError(true);
-      return;
-    }
+    const apiBase = import.meta.env.VITE_API_URL ?? 'https://api.the-mdl.com';
+    const manifestUrl = `${apiBase}/releases/latest`;
 
     fetch(manifestUrl)
       .then((res) => {
@@ -33,7 +29,12 @@ export function DownloadPage() {
         return res.json() as Promise<Manifest>;
       })
       .then((data) => {
-        setManifest(data);
+        // Resolve relative apkUrl against the API base so the Download
+        // button hits the backend proxy endpoint, not a relative path.
+        const resolvedApkUrl = data.apkUrl.startsWith('http')
+          ? data.apkUrl
+          : `${apiBase}${data.apkUrl}`;
+        setManifest({ ...data, apkUrl: resolvedApkUrl });
         setLoading(false);
       })
       .catch(() => {

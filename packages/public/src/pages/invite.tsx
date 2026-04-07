@@ -27,15 +27,21 @@ export function InvitePage() {
   const [manifestLoading, setManifestLoading] = useState(true);
 
   useEffect(() => {
-    const manifestUrl = import.meta.env.VITE_MANIFEST_URL;
-    if (!manifestUrl) {
-      setManifestLoading(false);
-      return;
-    }
+    const apiBase = import.meta.env.VITE_API_URL ?? 'https://api.the-mdl.com';
+    const manifestUrl = `${apiBase}/releases/latest`;
 
     fetch(manifestUrl)
       .then((res) => (res.ok ? (res.json() as Promise<Manifest>) : null))
-      .then((data) => setManifest(data))
+      .then((data) => {
+        if (!data) {
+          setManifest(null);
+          return;
+        }
+        const resolvedApkUrl = data.apkUrl.startsWith('http')
+          ? data.apkUrl
+          : `${apiBase}${data.apkUrl}`;
+        setManifest({ ...data, apkUrl: resolvedApkUrl });
+      })
       .catch(() => setManifest(null))
       .finally(() => setManifestLoading(false));
   }, []);

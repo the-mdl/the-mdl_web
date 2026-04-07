@@ -9,7 +9,11 @@ describe('DownloadPage', () => {
   });
 
   it('renders page header and sideload instructions', () => {
-    // No manifest URL → immediate error path, but header + instructions still render
+    // Fetch will fire but the header + instructions render regardless
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockRejectedValue(new Error('no network')),
+    );
     render(
       <MemoryRouter>
         <DownloadPage />
@@ -19,16 +23,14 @@ describe('DownloadPage', () => {
     expect(screen.getByText(/how to install/i)).toBeInTheDocument();
   });
 
-  it('fetches manifest and shows version info', async () => {
-    // Set the env var so fetch is called
-    (import.meta.env as Record<string, unknown>).VITE_MANIFEST_URL = 'https://example.com/manifest.json';
-
+  it('fetches release manifest and shows version info', async () => {
     const mockFetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () =>
         Promise.resolve({
-          version: '1.0.3',
-          apkUrl: 'https://example.com/app.apk',
+          version: 'v1.0.5+8',
+          apkUrl: '/releases/latest/apk',
+          publishedAt: '2026-04-04T02:10:41Z',
         }),
     });
     vi.stubGlobal('fetch', mockFetch);
@@ -40,20 +42,17 @@ describe('DownloadPage', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Version 1.0.3')).toBeInTheDocument();
+      expect(screen.getByText(/v1\.0\.5\+8/)).toBeInTheDocument();
     });
-    expect(screen.getByRole('link', { name: /download apk/i })).toHaveAttribute(
-      'href',
-      'https://example.com/app.apk',
-    );
 
-    // Cleanup
-    delete (import.meta.env as Record<string, unknown>).VITE_MANIFEST_URL;
+    const downloadLink = screen.getByRole('link', { name: /download apk/i });
+    expect(downloadLink).toHaveAttribute(
+      'href',
+      expect.stringContaining('/releases/latest/apk'),
+    );
   });
 
-  it('handles manifest fetch failure gracefully', async () => {
-    (import.meta.env as Record<string, unknown>).VITE_MANIFEST_URL = 'https://example.com/manifest.json';
-
+  it('handles release fetch failure gracefully', async () => {
     vi.stubGlobal(
       'fetch',
       vi.fn().mockRejectedValue(new Error('Network error')),
@@ -70,7 +69,5 @@ describe('DownloadPage', () => {
         screen.getByText(/unable to load version info/i),
       ).toBeInTheDocument();
     });
-
-    delete (import.meta.env as Record<string, unknown>).VITE_MANIFEST_URL;
   });
 });
