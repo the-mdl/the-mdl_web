@@ -7,6 +7,7 @@ import { ProfilePage } from './pages/profile';
 import { ExportPage } from './pages/export';
 import { DeletePage } from './pages/delete';
 import { DownloadPage } from './pages/download';
+import { InvitePage } from './pages/invite';
 import './app.css';
 
 /* ---------- auth guard ---------- */
@@ -44,6 +45,7 @@ export default function App() {
           {/* Public routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/download" element={<DownloadPage />} />
+          <Route path="/invite/:code" element={<InvitePage />} />
 
           {/* Login — redirects if already authed */}
           <Route element={<PublicOnly />}>
