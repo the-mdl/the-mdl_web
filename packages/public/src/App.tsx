@@ -44,7 +44,6 @@ export default function App() {
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<LandingPage />} />
-          <Route path="/download" element={<DownloadPage />} />
           <Route path="/invite/:code" element={<InvitePage />} />
 
           {/* Login — redirects if already authed */}
@@ -52,8 +51,9 @@ export default function App() {
             <Route path="/account" element={<LoginPage />} />
           </Route>
 
-          {/* Auth-guarded account routes */}
+          {/* Auth-guarded routes */}
           <Route element={<RequireAuth />}>
+            <Route path="/download" element={<DownloadPage />} />
             <Route element={<AccountLayout />}>
               <Route path="/account/profile" element={<ProfilePage />} />
               <Route path="/account/export" element={<ExportPage />} />
