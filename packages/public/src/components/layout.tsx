@@ -3,6 +3,7 @@ import { useAuth } from '../providers/auth';
 
 const navItems = [
   { to: '/account/profile', label: 'Profile' },
+  { to: '/download', label: 'Download App' },
   { to: '/account/export', label: 'Export Data' },
   { to: '/account/delete', label: 'Delete Account' },
 ];
